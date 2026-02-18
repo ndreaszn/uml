@@ -1,25 +1,16 @@
 public class Pedido {
     public String fecha;
     public Cliente cliente;
-    public Producto[] productos;
-    public int[] cantidades;
-    public int numeroProductos;
+    public LineaProducto[] lineasProducto;
+    public int numeroLineas;
+    public double costeTotal;
 
     public Pedido(Cliente cliente) {
         this.fecha = "11/02/2026";
         this.cliente = cliente;
-        this.productos = new Producto[50];
-        this.cantidades = new int[50];
-        this.numeroProductos = 0;
-        cliente.agregarPedido(this);
-    }
-
-    public Pedido(String fecha, Cliente cliente) {
-        this.fecha = fecha;
-        this.cliente = cliente;
-        this.productos = new Producto[50];
-        this.cantidades = new int[50];
-        this.numeroProductos = 0;
+        this.lineasProducto = new LineaProducto[50];
+        this.numeroLineas = 0;
+        this.costeTotal = 0.0;
         cliente.agregarPedido(this);
     }
 
@@ -31,16 +22,16 @@ public class Pedido {
         return cliente;
     }
 
-    public Producto[] getProductos() {
-        return productos;
+    public LineaProducto[] getLineasProducto() {
+        return lineasProducto;
     }
 
-    public int[] getCantidades() {
-        return cantidades;
+    public int getNumeroLineas() {
+        return numeroLineas;
     }
 
-    public int getNumeroProductos() {
-        return numeroProductos;
+    public double getCosteTotal() {
+        return costeTotal;
     }
 
     public void setFecha(String fecha) {
@@ -49,10 +40,11 @@ public class Pedido {
 
     public boolean agregarProducto(Producto producto, int cantidad) {
         if (producto.reducirStock(cantidad)) {
-            if (numeroProductos < productos.length) {
-                productos[numeroProductos] = producto;
-                cantidades[numeroProductos] = cantidad;
-                numeroProductos++;
+            if (numeroLineas < lineasProducto.length) {
+                LineaProducto nuevaLinea = new LineaProducto(producto, cantidad);
+                lineasProducto[numeroLineas] = nuevaLinea;
+                numeroLineas++;
+                costeTotal += nuevaLinea.getPrecioTotal();
                 return true;
             }
         }
@@ -60,29 +52,26 @@ public class Pedido {
         return false;
     }
 
+    // calcular el total del pedido
     public double calcularTotal() {
-        double total = 0.0;
-        for (int i = 0; i < numeroProductos; i++) {
-            total += productos[i].getPrecio() * cantidades[i];
-        }
-        return total;
+        return costeTotal;
     }
 
+    // mostrar detalles del pedido
     public void mostrarDetalles() {
-        System.out.println("\n--- DETALLE DEL PEDIDO ---");
+        System.out.println("\n=== DETALLE DEL PEDIDO ===");
         System.out.println("Fecha: " + fecha);
         System.out.println("Cliente: " + cliente.getNombre());
         System.out.println("\nProductos:");
-        for (int i = 0; i < numeroProductos; i++) {
-            Producto p = productos[i];
-            int cant = cantidades[i];
-            System.out.println("  - " + p.getNombre() + " x" + cant + " - €" + p.getPrecio() + " c/u = €" + (p.getPrecio() * cant));
+        for (int i = 0; i < numeroLineas; i++) {
+            LineaProducto linea = lineasProducto[i];
+            System.out.println("  - " + linea.getProducto().getNombre() + " x" + linea.getCantidad() + " - €" + linea.getProducto().getPrecio() + " c/u = €" + linea.getPrecioTotal());
         }
-        System.out.println("\nTOTAL: €" + calcularTotal());
-        System.out.println("---------------------------\n");
+        System.out.println("\nCOSTE TOTAL: €" + costeTotal);
+        System.out.println("========================\n");
     }
 
     public String toString() {
-        return "Pedido: " + "fecha = " + fecha + ", cliente = " + cliente.getNombre() + ", productos = " + numeroProductos + ", total = €" + calcularTotal();
+        return "Pedido: " + "fecha = " + fecha + ", cliente = " + cliente.getNombre() + ", lineas = " + numeroLineas + ", costeTotal = €" + costeTotal;
     }
 }

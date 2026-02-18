@@ -42,6 +42,6 @@ public class Producto {
     }
 
     public String toString() {
-        return "- '" + nombre + "' | precio = €" + precio + "| stockDisponible = " + stockDisponible;
+        return "- '" + nombre + "' | precio = €" + precio + " | stockDisponible = " + stockDisponible;
     }
 }
